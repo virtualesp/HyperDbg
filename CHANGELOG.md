@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 New release of the HyperDbg Debugger.
 
 ### Added
-- 
+- Hypertrace now works with HyperDbg VMM ([link](https://github.com/HyperDbg/HyperDbg/pull/568))
 
 ### Changed
-- 
+- Fix the problem of getting the PML1 entry of the target address on Intel Core Ultra processors (#567) ([link](https://github.com/HyperDbg/HyperDbg/issues/567))
 
 ## [0.18.0.0] - 2026-02-16
 New release of the HyperDbg Debugger.
