@@ -12,6 +12,7 @@ New release of the HyperDbg Debugger.
 
 ### Changed
 - Fix the problem of getting the PML1 entry of the target address on Intel Core Ultra processors (#567) ([link](https://github.com/HyperDbg/HyperDbg/issues/567))
+- Fix .clang-format formating error
 
 ## [0.18.0.0] - 2026-02-16
 New release of the HyperDbg Debugger.
