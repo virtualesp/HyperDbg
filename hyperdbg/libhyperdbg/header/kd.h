@@ -156,6 +156,9 @@ BOOLEAN
 KdSendSmiPacketsToDebuggee(PSMI_OPERATION_PACKETS SmiOperationRequest, UINT32 ExpectedRequestSize);
 
 BOOLEAN
+KdSendLbrPacketsToDebuggee(PLBR_OPERATION_PACKETS LbrOperationRequest, UINT32 ExpectedRequestSize);
+
+BOOLEAN
 KdSendQueryIdtPacketsToDebuggee(PINTERRUPT_DESCRIPTOR_TABLE_ENTRIES_PACKETS IdtRequest);
 
 BOOLEAN

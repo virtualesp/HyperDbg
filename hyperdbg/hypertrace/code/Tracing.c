@@ -10,7 +10,7 @@
  */
 
 #include "pch.h"
-#include "Lbr.h"
+
 /**
  * @brief Hide debugger on transparent-mode (activate transparent-mode)
  *
