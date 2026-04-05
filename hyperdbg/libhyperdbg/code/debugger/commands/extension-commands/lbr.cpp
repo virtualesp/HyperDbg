@@ -41,7 +41,7 @@ CommandLbrHelp()
  * @return VOID
  */
 BOOLEAN
-CommandLbrSendRequest(LBR_OPERATION_PACKETS * LbrRequest)
+CommandLbrSendRequest(HYPERTRACE_OPERATION_PACKETS * LbrRequest)
 {
     BOOL  Status;
     ULONG ReturnedLength;
@@ -51,7 +51,7 @@ CommandLbrSendRequest(LBR_OPERATION_PACKETS * LbrRequest)
         //
         // Send the request over serial kernel debugger
         //
-        if (!KdSendLbrPacketsToDebuggee(LbrRequest, SIZEOF_LBR_OPERATION_PACKETS))
+        if (!KdSendHyperTracePacketsToDebuggee(LbrRequest, SIZEOF_HYPERTRACE_OPERATION_PACKETS))
         {
             return FALSE;
         }
@@ -68,14 +68,14 @@ CommandLbrSendRequest(LBR_OPERATION_PACKETS * LbrRequest)
         // Send IOCTL
         //
         Status = DeviceIoControl(
-            g_DeviceHandle,               // Handle to device
-            IOCTL_PERFORM_LBR_OPERATION,  // IO Control Code (IOCTL)
-            LbrRequest,                   // Input Buffer to driver.
-            SIZEOF_LBR_OPERATION_PACKETS, // Input buffer length
-            LbrRequest,                   // Output Buffer from driver.
-            SIZEOF_LBR_OPERATION_PACKETS, // Length of output buffer in bytes.
-            &ReturnedLength,              // Bytes placed in buffer.
-            NULL                          // synchronous call
+            g_DeviceHandle,                      // Handle to device
+            IOCTL_PERFORM_HYPERTRACE_OPERATION,  // IO Control Code (IOCTL)
+            LbrRequest,                          // Input Buffer to driver.
+            SIZEOF_HYPERTRACE_OPERATION_PACKETS, // Input buffer length
+            LbrRequest,                          // Output Buffer from driver.
+            SIZEOF_HYPERTRACE_OPERATION_PACKETS, // Length of output buffer in bytes.
+            &ReturnedLength,                     // Bytes placed in buffer.
+            NULL                                 // synchronous call
         );
 
         if (!Status)
@@ -104,7 +104,7 @@ CommandLbrSendRequest(LBR_OPERATION_PACKETS * LbrRequest)
  * @return BOOLEAN
  */
 BOOLEAN
-HyperDbgPerformLbrOperation(LBR_OPERATION_PACKETS * LbrRequest)
+HyperDbgPerformLbrOperation(HYPERTRACE_OPERATION_PACKETS * LbrRequest)
 {
     return CommandLbrSendRequest(LbrRequest);
 }
@@ -120,7 +120,7 @@ HyperDbgPerformLbrOperation(LBR_OPERATION_PACKETS * LbrRequest)
 VOID
 CommandLbr(vector<CommandToken> CommandTokens, string Command)
 {
-    LBR_OPERATION_PACKETS LbrRequest = {0};
+    HYPERTRACE_OPERATION_PACKETS LbrRequest = {0};
 
     if (CommandTokens.size() != 2)
     {
@@ -133,11 +133,11 @@ CommandLbr(vector<CommandToken> CommandTokens, string Command)
 
     if (CompareLowerCaseStrings(CommandTokens.at(1), "enable"))
     {
-        LbrRequest.LbrOperationType = LBR_OPERATION_REQUEST_TYPE_ENABLE;
+        LbrRequest.HyperTraceOperationType = HYPERTRACE_LBR_OPERATION_REQUEST_TYPE_ENABLE;
     }
     else if (CompareLowerCaseStrings(CommandTokens.at(1), "disable"))
     {
-        LbrRequest.LbrOperationType = LBR_OPERATION_REQUEST_TYPE_DISABLE;
+        LbrRequest.HyperTraceOperationType = HYPERTRACE_LBR_OPERATION_REQUEST_TYPE_DISABLE;
     }
     else
     {
@@ -152,11 +152,11 @@ CommandLbr(vector<CommandToken> CommandTokens, string Command)
     //
     if (CommandLbrSendRequest(&LbrRequest))
     {
-        if (LbrRequest.LbrOperationType == LBR_OPERATION_REQUEST_TYPE_ENABLE)
+        if (LbrRequest.HyperTraceOperationType == HYPERTRACE_LBR_OPERATION_REQUEST_TYPE_ENABLE)
         {
             ShowMessages("LBR enabled successfully\n");
         }
-        else if (LbrRequest.LbrOperationType == LBR_OPERATION_REQUEST_TYPE_DISABLE)
+        else if (LbrRequest.HyperTraceOperationType == HYPERTRACE_LBR_OPERATION_REQUEST_TYPE_DISABLE)
         {
             ShowMessages("LBR disabled successfully\n");
         }

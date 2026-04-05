@@ -569,6 +569,14 @@ ShowErrorMessage(UINT32 Error)
                      Error);
         break;
 
+    case DEBUGGER_ERROR_HYPERTRACE_NOT_INITIALIZED:
+        ShowMessages("err, the HyperTrace module is not initialized (%x)\n",
+                     Error);
+
+    case DEBUGGER_ERROR_INVALID_HYPERTRACE_OPERATION_TYPE:
+        ShowMessages("err, invalid HyperTrace operation type is specified (%x)\n",
+                     Error);
+
     default:
         ShowMessages("err, error not found (%x)\n",
                      Error);

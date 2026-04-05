@@ -581,6 +581,18 @@
  */
 #define DEBUGGER_ERROR_UNABLE_TO_APPLY_COMMAND_TO_THE_TARGET_THREAD 0xc0000059
 
+/**
+ * @brief error, HyperTrace is not initialized
+ *
+ */
+#define DEBUGGER_ERROR_HYPERTRACE_NOT_INITIALIZED 0xc000005a
+
+/**
+ * @brief error, invalid HyperTrace operation type is specified in the request,
+ *
+ */
+#define DEBUGGER_ERROR_INVALID_HYPERTRACE_OPERATION_TYPE 0xc000005b
+
 //
 // WHEN YOU ADD ANYTHING TO THIS LIST OF ERRORS, THEN
 // MAKE SURE TO ADD AN ERROR MESSAGE TO ShowErrorMessage(UINT32 Error)

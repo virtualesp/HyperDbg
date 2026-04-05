@@ -1265,33 +1265,33 @@ typedef struct _SMI_OPERATION_PACKETS
  */
 
 /**
- * @brief Perform actions related to LBR
+ * @brief Perform actions related to HyperTrace
  *
  */
-typedef enum _LBR_OPERATION_REQUEST_TYPE
+typedef enum _HYPERTRACE_OPERATION_REQUEST_TYPE
 {
-    LBR_OPERATION_REQUEST_TYPE_ENABLE,
-    LBR_OPERATION_REQUEST_TYPE_DISABLE,
+    HYPERTRACE_LBR_OPERATION_REQUEST_TYPE_ENABLE,
+    HYPERTRACE_LBR_OPERATION_REQUEST_TYPE_DISABLE,
 
-} LBR_OPERATION_REQUEST_TYPE;
+} HYPERTRACE_OPERATION_REQUEST_TYPE;
 
 /**
- * @brief The structure of LBR result packet in HyperDbg
+ * @brief The structure of HyperTrace result packet in HyperDbg
  *
  */
-typedef struct _LBR_OPERATION_PACKETS
+typedef struct _HYPERTRACE_OPERATION_PACKETS
 {
-    LBR_OPERATION_REQUEST_TYPE LbrOperationType;
-    UINT32                     KernelStatus;
+    HYPERTRACE_OPERATION_REQUEST_TYPE HyperTraceOperationType;
+    UINT32                            KernelStatus;
 
-} LBR_OPERATION_PACKETS, *PLBR_OPERATION_PACKETS;
+} HYPERTRACE_OPERATION_PACKETS, *PHYPERTRACE_OPERATION_PACKETS;
 
 /**
- * @brief Debugger size of LBR_OPERATION_PACKETS
+ * @brief Debugger size of HYPERTRACE_OPERATION_PACKETS
  *
  */
-#define SIZEOF_LBR_OPERATION_PACKETS \
-    sizeof(LBR_OPERATION_PACKETS)
+#define SIZEOF_HYPERTRACE_OPERATION_PACKETS \
+    sizeof(HYPERTRACE_OPERATION_PACKETS)
 
 /* ==============================================================================================
  */

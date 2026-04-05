@@ -1056,36 +1056,36 @@ KdSendSmiPacketsToDebuggee(PSMI_OPERATION_PACKETS SmiOperationRequest, UINT32 Ex
 }
 
 /**
- * @brief Send requests for LBR operation packet to the debuggee
+ * @brief Send requests for HyperTrace operation packet to the debuggee
  *
- * @param LbrOperationRequest
+ * @param HyperTraceOperationRequest
  *
  * @return BOOLEAN
  */
 BOOLEAN
-KdSendLbrPacketsToDebuggee(PLBR_OPERATION_PACKETS LbrOperationRequest, UINT32 ExpectedRequestSize)
+KdSendHyperTracePacketsToDebuggee(PHYPERTRACE_OPERATION_PACKETS HyperTraceOperationRequest, UINT32 ExpectedRequestSize)
 {
     //
     // Set the request data
     //
-    DbgWaitSetKernelRequestData(DEBUGGER_SYNCRONIZATION_OBJECT_KERNEL_DEBUGGER_LBR_OPERATION_RESULT, LbrOperationRequest, ExpectedRequestSize);
+    DbgWaitSetKernelRequestData(DEBUGGER_SYNCRONIZATION_OBJECT_KERNEL_DEBUGGER_HYPERTRACE_OPERATION_RESULT, HyperTraceOperationRequest, ExpectedRequestSize);
 
     //
     // Send the LBR request packets
     //
     if (!KdCommandPacketAndBufferToDebuggee(
             DEBUGGER_REMOTE_PACKET_TYPE_DEBUGGER_TO_DEBUGGEE_EXECUTE_ON_VMX_ROOT,
-            DEBUGGER_REMOTE_PACKET_REQUESTED_ACTION_ON_VMX_ROOT_PERFORM_LBR_OPERATION,
-            (CHAR *)LbrOperationRequest,
-            SIZEOF_LBR_OPERATION_PACKETS))
+            DEBUGGER_REMOTE_PACKET_REQUESTED_ACTION_ON_VMX_ROOT_PERFORM_HYPERTRACE_OPERATION,
+            (CHAR *)HyperTraceOperationRequest,
+            SIZEOF_HYPERTRACE_OPERATION_PACKETS))
     {
         return FALSE;
     }
 
     //
-    // Wait until the result of actions to LBR is received
+    // Wait until the result of actions to HyperTrace is received
     //
-    DbgWaitForKernelResponse(DEBUGGER_SYNCRONIZATION_OBJECT_KERNEL_DEBUGGER_LBR_OPERATION_RESULT);
+    DbgWaitForKernelResponse(DEBUGGER_SYNCRONIZATION_OBJECT_KERNEL_DEBUGGER_HYPERTRACE_OPERATION_RESULT);
 
     return TRUE;
 }

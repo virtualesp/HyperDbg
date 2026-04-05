@@ -8,7 +8,6 @@
  *
  * @copyright This project is released under the GNU Public License v3.
  */
-
 #pragma once
 
 //////////////////////////////////////////////////
@@ -148,6 +147,9 @@ LbrCreateLbrState();
 
 LBR_STATE *
 LbrFindLbrState(ULONG Pid);
+
+BOOLEAN
+LbrCheck();
 
 VOID
 LbrInsertLbrState(LBR_STATE * NewState);
