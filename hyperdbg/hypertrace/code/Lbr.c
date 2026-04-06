@@ -105,15 +105,22 @@ LbrInitialize()
 VOID
 LbrGetLbr(LBR_STATE * State, BOOLEAN ApplyFromVmxRootMode)
 {
-    UNREFERENCED_PARAMETER(ApplyFromVmxRootMode);
-
     ULONG     i;
     ULONGLONG DbgCtlMsr;
     KIRQL     OldIrql;
 
-    xrdmsr(MSR_IA32_DEBUGCTLMSR, &DbgCtlMsr);
-    DbgCtlMsr &= ~DEBUGCTLMSR_LBR;
-    xwrmsr(MSR_IA32_DEBUGCTLMSR, DbgCtlMsr);
+    if (ApplyFromVmxRootMode)
+    {
+        __vmx_vmread(VMCS_GUEST_DEBUGCTL, &DbgCtlMsr);
+        DbgCtlMsr &= ~DEBUGCTLMSR_LBR;
+        __vmx_vmwrite(VMCS_GUEST_DEBUGCTL, DbgCtlMsr);
+    }
+    else
+    {
+        xrdmsr(MSR_IA32_DEBUGCTLMSR, &DbgCtlMsr);
+        DbgCtlMsr &= ~DEBUGCTLMSR_LBR;
+        xwrmsr(MSR_IA32_DEBUGCTLMSR, DbgCtlMsr);
+    }
 
     xacquire_lock(&LbrStateLock, &OldIrql);
     xrdmsr(MSR_LBR_SELECT, &State->Config.LbrSelect);
@@ -138,8 +145,6 @@ LbrGetLbr(LBR_STATE * State, BOOLEAN ApplyFromVmxRootMode)
 VOID
 LbrPutLbr(LBR_STATE * State, BOOLEAN ApplyFromVmxRootMode)
 {
-    UNREFERENCED_PARAMETER(ApplyFromVmxRootMode);
-
     ULONGLONG DbgCtlMsr;
     KIRQL     OldIrql;
 
@@ -158,12 +163,24 @@ LbrPutLbr(LBR_STATE * State, BOOLEAN ApplyFromVmxRootMode)
 
     xrelease_lock(&LbrStateLock, &OldIrql);
 
-    // Enable LBR and CLEAR 'Freeze LBRs on PMI' (Bit 11)
-    // If Bit 11 is set, the LBR stops as soon as a single interrupt happens.
-    xrdmsr(MSR_IA32_DEBUGCTLMSR, &DbgCtlMsr);
-    DbgCtlMsr |= DEBUGCTLMSR_LBR; // Bit 0 = 1
-    DbgCtlMsr &= ~(1ULL << 11);   // Bit 11 = 0
-    xwrmsr(MSR_IA32_DEBUGCTLMSR, DbgCtlMsr);
+    if (ApplyFromVmxRootMode)
+    {
+        __vmx_vmread(VMCS_GUEST_DEBUGCTL, &DbgCtlMsr);
+        DbgCtlMsr |= DEBUGCTLMSR_LBR; // Bit 0 = 1
+        DbgCtlMsr &= ~(1ULL << 11);   // Bit 11 = 0
+        __vmx_vmwrite(VMCS_GUEST_DEBUGCTL, DbgCtlMsr);
+    }
+    else
+    {
+        //
+        // Enable LBR and CLEAR 'Freeze LBRs on PMI' (Bit 11)
+        // If Bit 11 is set, the LBR stops as soon as a single interrupt happens
+        //
+        xrdmsr(MSR_IA32_DEBUGCTLMSR, &DbgCtlMsr);
+        DbgCtlMsr |= DEBUGCTLMSR_LBR; // Bit 0 = 1
+        DbgCtlMsr &= ~(1ULL << 11);   // Bit 11 = 0
+        xwrmsr(MSR_IA32_DEBUGCTLMSR, DbgCtlMsr);
+    }
 }
 
 /**
@@ -547,11 +564,14 @@ LbrIoctlHandler(XIOCTL_REQUEST * Request, BOOLEAN ApplyFromVmxRootMode)
  *
  * @param PrevPid
  * @param NextPid
+ * @param ApplyFromVmxRootMode
+ *
  * @return VOID
  */
 VOID
-LbrCswitchHandler(ULONG PrevPid,
-                  ULONG NextPid)
+LbrCswitchHandler(ULONG   PrevPid,
+                  ULONG   NextPid,
+                  BOOLEAN ApplyFromVmxRootMode)
 {
     LBR_STATE * PrevState;
     LBR_STATE * NextState;
@@ -564,7 +584,7 @@ LbrCswitchHandler(ULONG PrevPid,
         LogInfo("LIBIHT-COM: LBR context switch from pid %d on cpu core %d\n",
                 PrevState->Config.Pid,
                 xcoreid());
-        LbrGetLbr(PrevState, FALSE); // Assume this is called from non-VMX root
+        LbrGetLbr(PrevState, ApplyFromVmxRootMode);
     }
 
     if (NextState)
@@ -572,7 +592,7 @@ LbrCswitchHandler(ULONG PrevPid,
         LogInfo("LIBIHT-COM: LBR context switch to pid %d on cpu core %d\n",
                 NextState->Config.Pid,
                 xcoreid());
-        LbrPutLbr(NextState, FALSE); // Assume this is called from non-VMX root
+        LbrPutLbr(NextState, ApplyFromVmxRootMode);
     }
 }
 
@@ -581,12 +601,15 @@ LbrCswitchHandler(ULONG PrevPid,
  *
  * @param ParentPid
  * @param ChildPid
+ * @param ApplyFromVmxRootMode
+ *
  * @return VOID
  */
 VOID
 LbrNewProcHandler(
-    ULONG ParentPid,
-    ULONG ChildPid)
+    ULONG   ParentPid,
+    ULONG   ChildPid,
+    BOOLEAN ApplyFromVmxRootMode)
 {
     LBR_STATE *ParentState, *ChildState;
     KIRQL      OldIrql;
@@ -615,7 +638,9 @@ LbrNewProcHandler(
     LbrInsertLbrState(ChildState);
 
     if (ChildPid == xgetcurrent_pid())
-        LbrPutLbr(ChildState, FALSE); // Assume this is called from non-VMX root
+    {
+        LbrPutLbr(ChildState, ApplyFromVmxRootMode);
+    }
 }
 
 /**

@@ -38,6 +38,11 @@
 #define HYPERDBG_HYPERTRACE
 
 //
+// Add ia32-doc
+//
+#include "ia32-doc/out/ia32.h"
+
+//
 // Unload function (to be called when the driver is unloaded)
 //
 #include "UnloadDll.h"
