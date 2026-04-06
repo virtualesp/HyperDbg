@@ -588,10 +588,28 @@
 #define DEBUGGER_ERROR_HYPERTRACE_NOT_INITIALIZED 0xc000005a
 
 /**
- * @brief error, invalid HyperTrace operation type is specified in the request,
+ * @brief error, invalid HyperTrace operation type is specified in the request
  *
  */
 #define DEBUGGER_ERROR_INVALID_HYPERTRACE_OPERATION_TYPE 0xc000005b
+
+/**
+ * @brief error, LBR is already enabled
+ *
+ */
+#define DEBUGGER_ERROR_LBR_ALREADY_ENABLED 0xc000005c
+
+/**
+ * @brief error, LBR is already disabled
+ *
+ */
+#define DEBUGGER_ERROR_LBR_ALREADY_DISABLED 0xc000005d
+
+/**
+ * @brief error, LBR is not supported by the processor
+ *
+ */
+#define DEBUGGER_ERROR_LBR_NOT_SUPPORTED 0xc000005e
 
 //
 // WHEN YOU ADD ANYTHING TO THIS LIST OF ERRORS, THEN

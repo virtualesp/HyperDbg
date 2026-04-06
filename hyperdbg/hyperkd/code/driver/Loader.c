@@ -48,7 +48,7 @@ LoaderInitHyperTrace()
     //
     // Initialize hypertrace module
     //
-    if (HyperTraceInit(&HyperTraceCallbacks))
+    if (HyperTraceInitCallback(&HyperTraceCallbacks))
     {
         LogDebugInfo("HyperDbg's hypertrace loaded successfully");
         return TRUE;
