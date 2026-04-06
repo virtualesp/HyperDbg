@@ -47,7 +47,7 @@ PerformLbrTraceAfterEnable()
     Request.LbrConfig.Pid       = 0;
     Request.LbrConfig.LbrSelect = LBR_SELECT;
 
-    if (LbrStartLbr(&Request))
+    if (LbrStartLbr(&Request, FALSE)) // Assume this is called from non-VMX root
     {
         for (volatile int i = 0; i < 50; i++)
         {
@@ -67,13 +67,14 @@ PerformLbrTraceAfterEnable()
 
         if (State)
         {
-            LbrGetLbr(State);
+            LbrGetLbr(State, FALSE); // Assume this is called from non-VMX root
         }
 
         LogInfo("Dumping LBR Buffer...\n");
-        LbrDumpLbr(&Request);
 
-        LbrStopLbr(&Request);
+        LbrDumpLbr(&Request, FALSE); // Assume this is called from non-VMX root
+
+        LbrStopLbr(&Request, FALSE); // Assume this is called from non-VMX root
     }
 
     KeRevertToUserAffinityThread();
@@ -81,27 +82,29 @@ PerformLbrTraceAfterEnable()
 
 /**
  * @brief Start LBR tracing for HyperTrace
+ * @param ApplyFromVmxRootMode
  *
  * @return BOOLEAN
  */
 BOOLEAN
-HyperTraceStartLbr()
+HyperTraceStartLbr(BOOLEAN ApplyFromVmxRootMode)
 {
     LBR_IOCTL_REQUEST Request = {0};
 
     Request.LbrConfig.Pid       = 0;
     Request.LbrConfig.LbrSelect = LBR_SELECT;
 
-    return LbrStartLbr(&Request);
+    return LbrStartLbr(&Request, ApplyFromVmxRootMode);
 }
 
 /**
  * @brief Stop LBR tracing for HyperTrace
+ * @param ApplyFromVmxRootMode
  *
  * @return BOOLEAN
  */
 BOOLEAN
-HyperTraceStopLbr()
+HyperTraceStopLbr(BOOLEAN ApplyFromVmxRootMode)
 {
     LBR_IOCTL_REQUEST Request = {0};
 
@@ -112,13 +115,13 @@ HyperTraceStopLbr()
 
     if (State)
     {
-        LbrGetLbr(State);
+        LbrGetLbr(State, ApplyFromVmxRootMode);
     }
 
     LogInfo("Dumping LBR Buffer...\n");
-    LbrDumpLbr(&Request);
+    LbrDumpLbr(&Request, ApplyFromVmxRootMode);
 
-    return LbrStopLbr(&Request);
+    return LbrStopLbr(&Request, ApplyFromVmxRootMode);
 }
 
 /**

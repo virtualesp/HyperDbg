@@ -2027,7 +2027,7 @@ ScriptEngineFunctionLbrStart()
 
 #ifdef SCRIPT_ENGINE_KERNEL_MODE
 
-    HyperTraceStartLbr();
+    HyperTraceStartLbr(VmFuncVmxGetCurrentExecutionMode());
 
 #endif // SCRIPT_ENGINE_KERNEL_MODE
 }
@@ -2045,6 +2045,6 @@ ScriptEngineFunctionLbrStop()
 #endif // SCRIPT_ENGINE_USER_MODE
 
 #ifdef SCRIPT_ENGINE_KERNEL_MODE
-    HyperTraceStopLbr();
+    HyperTraceStopLbr(VmFuncVmxGetCurrentExecutionMode());
 #endif // SCRIPT_ENGINE_KERNEL_MODE
 }
