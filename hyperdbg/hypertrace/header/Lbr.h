@@ -164,10 +164,10 @@ VOID
 LbrInitialize();
 
 BOOLEAN
-LbrEnableLbr(LBR_IOCTL_REQUEST * Request);
+LbrStartLbr(LBR_IOCTL_REQUEST * Request);
 
 BOOLEAN
-LbrDisableLbr(LBR_IOCTL_REQUEST * Request);
+LbrStopLbr(LBR_IOCTL_REQUEST * Request);
 
 BOOLEAN
 LbrDumpLbr(LBR_IOCTL_REQUEST * Request);

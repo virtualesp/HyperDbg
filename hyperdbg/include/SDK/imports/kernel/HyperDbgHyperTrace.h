@@ -17,7 +17,7 @@
 #endif
 
 //////////////////////////////////////////////////
-//            hypertrace functions 	    		//
+//            HyperTrace Functions 	    		//
 //////////////////////////////////////////////////
 
 //
@@ -38,3 +38,13 @@ HyperTraceUninit();
 IMPORT_EXPORT_HYPERTRACE BOOLEAN
 HyperTracePerformOperation(HYPERTRACE_OPERATION_PACKETS * LbrOperationRequest,
                            BOOLEAN                        ApplyFromVmxRootMode);
+
+//////////////////////////////////////////////////
+//                LBR Functions 	    		//
+//////////////////////////////////////////////////
+
+IMPORT_EXPORT_HYPERTRACE BOOLEAN
+HyperTraceStartLbr();
+
+IMPORT_EXPORT_HYPERTRACE BOOLEAN
+HyperTraceStopLbr();

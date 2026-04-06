@@ -47,7 +47,7 @@ PerformLbrTraceAfterEnable()
     Request.LbrConfig.Pid       = 0;
     Request.LbrConfig.LbrSelect = LBR_SELECT;
 
-    if (LbrEnableLbr(&Request))
+    if (LbrStartLbr(&Request))
     {
         for (volatile int i = 0; i < 50; i++)
         {
@@ -62,6 +62,7 @@ PerformLbrTraceAfterEnable()
                 __nop();
             }
         }
+
         LBR_STATE * State = LbrFindLbrState(0);
 
         if (State)
@@ -72,10 +73,52 @@ PerformLbrTraceAfterEnable()
         LogInfo("Dumping LBR Buffer...\n");
         LbrDumpLbr(&Request);
 
-        LbrDisableLbr(&Request);
+        LbrStopLbr(&Request);
     }
 
     KeRevertToUserAffinityThread();
+}
+
+/**
+ * @brief Start LBR tracing for HyperTrace
+ *
+ * @return BOOLEAN
+ */
+BOOLEAN
+HyperTraceStartLbr()
+{
+    LBR_IOCTL_REQUEST Request = {0};
+
+    Request.LbrConfig.Pid       = 0;
+    Request.LbrConfig.LbrSelect = LBR_SELECT;
+
+    return LbrStartLbr(&Request);
+}
+
+/**
+ * @brief Stop LBR tracing for HyperTrace
+ *
+ * @return BOOLEAN
+ */
+BOOLEAN
+HyperTraceStopLbr()
+{
+    LBR_IOCTL_REQUEST Request = {0};
+
+    Request.LbrConfig.Pid       = 0;
+    Request.LbrConfig.LbrSelect = LBR_SELECT;
+
+    LBR_STATE * State = LbrFindLbrState(0);
+
+    if (State)
+    {
+        LbrGetLbr(State);
+    }
+
+    LogInfo("Dumping LBR Buffer...\n");
+    LbrDumpLbr(&Request);
+
+    return LbrStopLbr(&Request);
 }
 
 /**

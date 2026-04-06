@@ -197,13 +197,13 @@ LbrFlushLbr()
 }
 
 /**
- * @brief Enable LBR for a specific process and store the configuration in the global LBR state list
+ * @brief Start collecting LBR branches for a specific process and store the configuration in the global LBR state list
  *
  * @param Request
  * @return BOOLEAN
  */
 BOOLEAN
-LbrEnableLbr(LBR_IOCTL_REQUEST * Request)
+LbrStartLbr(LBR_IOCTL_REQUEST * Request)
 {
     LBR_STATE * State;
 
@@ -246,13 +246,13 @@ LbrEnableLbr(LBR_IOCTL_REQUEST * Request)
 }
 
 /**
- * @brief Disable LBR for a specific process and remove the corresponding LBR state from the global list
+ * @brief Stop collecting LBR branches for a specific process and remove the corresponding LBR state from the global list
  *
  * @param Request
  * @return BOOLEAN
  */
 BOOLEAN
-LbrDisableLbr(LBR_IOCTL_REQUEST * Request)
+LbrStopLbr(LBR_IOCTL_REQUEST * Request)
 {
     LBR_STATE * State;
 
@@ -501,10 +501,10 @@ LbrIoctlHandler(XIOCTL_REQUEST * Request)
     switch (Request->Cmd)
     {
     case LIBIHT_IOCTL_ENABLE_LBR:
-        Status = LbrEnableLbr(&Request->Body.Lbr);
+        Status = LbrStartLbr(&Request->Body.Lbr);
         break;
     case LIBIHT_IOCTL_DISABLE_LBR:
-        Status = LbrDisableLbr(&Request->Body.Lbr);
+        Status = LbrStopLbr(&Request->Body.Lbr);
         break;
     case LIBIHT_IOCTL_DUMP_LBR:
         Status = LbrDumpLbr(&Request->Body.Lbr);
