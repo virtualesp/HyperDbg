@@ -11,9 +11,9 @@ New release of the HyperDbg Debugger.
 - Hypertrace now works with HyperDbg VMM ([link](https://github.com/HyperDbg/HyperDbg/pull/568))
 - Progress on implementing Last Branch Recode (LBR) ([link](https://github.com/HyperDbg/HyperDbg/commit/1dd73675e9cd78737e013ffb35bc712f385f387e))
 - Applying LBR registers on the VMCS instead of the DEBUGCTL MSR ([link](https://github.com/HyperDbg/HyperDbg/commit/15f8b3cca15448acd18d7e198740464a19ce4fe2))
-- Fix the problem of the '!epthook' not finding the PML1 entry
 
 ### Changed
+- Fix the problem of the '!epthook' not finding the PML1 entry ([link](https://docs.hyperdbg.org/commands/extension-commands/epthook))
 - Fix the problem of getting the PML1 entry of the target address on Intel Core Ultra processors (#567) ([link](https://github.com/HyperDbg/HyperDbg/issues/567))
 - Fix the '.clang-format' formatting error
 
