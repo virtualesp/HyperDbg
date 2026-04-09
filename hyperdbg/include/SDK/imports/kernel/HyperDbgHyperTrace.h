@@ -17,17 +17,34 @@
 #endif
 
 //////////////////////////////////////////////////
-//            hypertrace functions 	    		//
+//            HyperTrace Functions 	    		//
 //////////////////////////////////////////////////
 
 //
 // Initialize the hypertrace module with the provided callbacks
 //
 IMPORT_EXPORT_HYPERTRACE BOOLEAN
-HyperTraceInit(HYPERTRACE_CALLBACKS * HypertraceCallbacks);
+HyperTraceInitCallback(HYPERTRACE_CALLBACKS * HypertraceCallbacks);
 
 //
-// Check if LBR is supported and initialize LBR state list and lock
+// Uninitialize the HyperTrace module
+//
+IMPORT_EXPORT_HYPERTRACE VOID
+HyperTraceUninit();
+
+//
+// Perform operations related to HyperTrace based on the request type and parameters
 //
 IMPORT_EXPORT_HYPERTRACE BOOLEAN
-LbrCheck();
+HyperTracePerformOperation(HYPERTRACE_OPERATION_PACKETS * LbrOperationRequest,
+                           BOOLEAN                        ApplyFromVmxRootMode);
+
+//////////////////////////////////////////////////
+//                LBR Functions 	    		//
+//////////////////////////////////////////////////
+
+IMPORT_EXPORT_HYPERTRACE BOOLEAN
+HyperTraceStartLbr(BOOLEAN ApplyFromVmxRootMode);
+
+IMPORT_EXPORT_HYPERTRACE BOOLEAN
+HyperTraceStopLbr(BOOLEAN ApplyFromVmxRootMode);

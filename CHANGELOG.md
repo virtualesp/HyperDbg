@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.1.0] - 2026-04-09
+New release of the HyperDbg Debugger.
+
+### Added
+- Hypertrace now works with HyperDbg VMM ([link](https://github.com/HyperDbg/HyperDbg/pull/568))
+- Progress on implementing Last Branch Recode (LBR) ([link](https://github.com/HyperDbg/HyperDbg/commit/1dd73675e9cd78737e013ffb35bc712f385f387e))
+- Applying LBR registers on the VMCS instead of the DEBUGCTL MSR ([link](https://github.com/HyperDbg/HyperDbg/commit/15f8b3cca15448acd18d7e198740464a19ce4fe2))
+- Fix the problem of the '!epthook' not finding the PML1 entry
+
+### Changed
+- Fix the problem of getting the PML1 entry of the target address on Intel Core Ultra processors (#567) ([link](https://github.com/HyperDbg/HyperDbg/issues/567))
+- Fix the '.clang-format' formatting error
+
 ## [0.18.0.0] - 2026-02-16
 New release of the HyperDbg Debugger.
 
@@ -14,10 +27,6 @@ New release of the HyperDbg Debugger.
 - Initial efforts to port HyperDbg to Linux have started thanks to [@Alish14](https://github.com/Alish14) ([link](https://github.com/HyperDbg/HyperDbg/pull/563))
 
 ### Changed
-- Fix bugs for interpreting 'db_pa, 'dd_pa', 'eb_pa', and 'ed_pa' keywords in the script engine ([link](https://docs.hyperdbg.org/commands/scripting-language/assumptions-and-evaluations#keywords))([link](https://github.com/HyperDbg/HyperDbg/pull/507))
-- Fix variable types in the script engine ([link](https://github.com/HyperDbg/HyperDbg/commit/43b0245fa11b5c73ce4cd21d8b8787b86a05f89d))
-- Fix and update array index for boolean expressions in the script engine ([link](https://github.com/HyperDbg/HyperDbg/commit/ba2cec3c12c3ff45ddc0004051884983ff62a0b3))
-- Fix and update array index for boolean expressions in the script engine ([link](https://github.com/HyperDbg/HyperDbg/commit/ba2cec3c12c3ff45ddc0004051884983ff62a0b3))
 - Fix compilation error in Zydis with the new Windows WDK ([link](https://github.com/HyperDbg/zydis/commit/e61f59332ce49f8853006573ca853e404fafdd08))
 
 ## [0.17.0.0] - 2025-11-10

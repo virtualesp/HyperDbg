@@ -294,6 +294,28 @@ EptBuildMtrrMap(VOID)
 }
 
 /**
+ * @brief Resolve the split PML1 VA that belongs to a given PML2 entry
+ *
+ * @param EptPageTable The EPT page table
+ * @param TargetEntry The target PML2 entry
+ * @return PEPT_PML1_ENTRY Returns base VA of PML1 page, or NULL if not tracked
+ */
+_Must_inspect_result_
+static PEPT_PML1_ENTRY
+EptGetSplitPml1VaByPml2Entry(_In_ PVMM_EPT_PAGE_TABLE EptPageTable, _In_ PEPT_PML2_ENTRY TargetEntry)
+{
+    LIST_FOR_EACH_LINK(EptPageTable->DynamicSplitList, VMM_EPT_DYNAMIC_SPLIT, DynamicSplitList, CurrentSplit)
+    {
+        if (CurrentSplit->Fields.Entry == TargetEntry)
+        {
+            return &CurrentSplit->PML1[0];
+        }
+    }
+
+    return NULL;
+}
+
+/**
  * @brief Get the PML1 entry for this physical address if the page is split
  *
  * @param EptPageTable The EPT Page Table
@@ -303,10 +325,9 @@ EptBuildMtrrMap(VOID)
 PEPT_PML1_ENTRY
 EptGetPml1Entry(PVMM_EPT_PAGE_TABLE EptPageTable, SIZE_T PhysicalAddress)
 {
-    SIZE_T            Directory, DirectoryPointer, PML4Entry;
-    PEPT_PML2_ENTRY   PML2;
-    PEPT_PML1_ENTRY   PML1;
-    PEPT_PML2_POINTER PML2Pointer;
+    SIZE_T          Directory, DirectoryPointer, PML4Entry;
+    PEPT_PML2_ENTRY PML2;
+    PEPT_PML1_ENTRY PML1;
 
     Directory        = ADDRMASK_EPT_PML2_INDEX(PhysicalAddress);
     DirectoryPointer = ADDRMASK_EPT_PML3_INDEX(PhysicalAddress);
@@ -331,15 +352,9 @@ EptGetPml1Entry(PVMM_EPT_PAGE_TABLE EptPageTable, SIZE_T PhysicalAddress)
     }
 
     //
-    // Conversion to get the right PageFrameNumber.
-    // These pointers occupy the same place in the table and are directly convertible.
+    // Resolve the split PML1 VA that was recorded during EptSplitLargePage
     //
-    PML2Pointer = (PEPT_PML2_POINTER)PML2;
-
-    //
-    // If it is, translate to the PML1 pointer
-    //
-    PML1 = (PEPT_PML1_ENTRY)PhysicalAddressToVirtualAddress(PML2Pointer->PageFrameNumber * PAGE_SIZE);
+    PML1 = EptGetSplitPml1VaByPml2Entry(EptPageTable, PML2);
 
     if (!PML1)
     {
@@ -367,10 +382,9 @@ EptGetPml1Entry(PVMM_EPT_PAGE_TABLE EptPageTable, SIZE_T PhysicalAddress)
 PVOID
 EptGetPml1OrPml2Entry(PVMM_EPT_PAGE_TABLE EptPageTable, SIZE_T PhysicalAddress, BOOLEAN * IsLargePage)
 {
-    SIZE_T            Directory, DirectoryPointer, PML4Entry;
-    PEPT_PML2_ENTRY   PML2;
-    PEPT_PML1_ENTRY   PML1;
-    PEPT_PML2_POINTER PML2Pointer;
+    SIZE_T          Directory, DirectoryPointer, PML4Entry;
+    PEPT_PML2_ENTRY PML2;
+    PEPT_PML1_ENTRY PML1;
 
     Directory        = ADDRMASK_EPT_PML2_INDEX(PhysicalAddress);
     DirectoryPointer = ADDRMASK_EPT_PML3_INDEX(PhysicalAddress);
@@ -396,15 +410,9 @@ EptGetPml1OrPml2Entry(PVMM_EPT_PAGE_TABLE EptPageTable, SIZE_T PhysicalAddress, 
     }
 
     //
-    // Conversion to get the right PageFrameNumber.
-    // These pointers occupy the same place in the table and are directly convertible.
+    // Resolve the split PML1 VA that was recorded during EptSplitLargePage
     //
-    PML2Pointer = (PEPT_PML2_POINTER)PML2;
-
-    //
-    // If it is, translate to the PML1 pointer
-    //
-    PML1 = (PEPT_PML1_ENTRY)PhysicalAddressToVirtualAddress(PML2Pointer->PageFrameNumber * PAGE_SIZE);
+    PML1 = EptGetSplitPml1VaByPml2Entry(EptPageTable, PML2);
 
     if (!PML1)
     {
@@ -512,7 +520,7 @@ EptSplitLargePage(PVMM_EPT_PAGE_TABLE EptPageTable,
     // Point back to the entry in the dynamic split for easy reference for which entry that
     // dynamic split is for
     //
-    NewSplit->u.Entry = TargetEntry;
+    NewSplit->Fields.Entry = TargetEntry;
 
     //
     // Make a template for RWX
@@ -584,6 +592,12 @@ EptSplitLargePage(PVMM_EPT_PAGE_TABLE EptPageTable,
     // Now, replace the entry in the page table with our new split pointer
     //
     RtlCopyMemory(TargetEntry, &NewPointer, sizeof(NewPointer));
+
+    //
+    // Track the split so we can directly resolve PML1 VA from PML2 entry
+    // without any PA->VA reverse translation
+    //
+    InsertHeadList(&EptPageTable->DynamicSplitList, &(NewSplit->DynamicSplitList));
 
     return TRUE;
 }
@@ -683,6 +697,11 @@ EptAllocateAndCreateIdentityPageTable(VOID)
         LogError("Err, failed to allocate memory for PageTable");
         return NULL;
     }
+
+    //
+    // Keep track of dynamic 2MB->4KB split metadata for this EPT table.
+    //
+    InitializeListHead(&PageTable->DynamicSplitList);
 
     //
     // Create the template for the first entry in the PML4
